@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Register</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --bg: #060610;
+      --card: rgba(255,255,255,0.04);
+      --card-border: rgba(255,255,255,0.09);
+      --input-bg: rgba(255,255,255,0.05);
+      --input-border: rgba(255,255,255,0.1);
+      --accent: #6366f1;
+      --accent2: #06b6d4;
+      --text: #f1f5f9;
+      --muted: #94a3b8;
+    }
+
+    body {
+      font-family: 'Sora', sans-serif;
+      background: var(--bg);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      padding: 24px 0;
+    }
+
+    /* ── Animated background orbs ── */
+    .bg-orbs { position: fixed; inset: 0; pointer-events: none; z-index: 0; }
+    .orb {
+      position: absolute; border-radius: 50%;
+      filter: blur(90px); opacity: 0.35;
+      animation: drift 14s ease-in-out infinite alternate;
+    }
+    .orb-1 { width: 500px; height: 500px; background: #a78bfa; top: -120px; right: -100px; animation-duration: 16s; }
+    .orb-2 { width: 380px; height: 380px; background: #06b6d4; bottom: -80px; left: -80px; animation-duration: 11s; animation-delay: -4s; }
+    .orb-3 { width: 260px; height: 260px; background: #f43f5e; top: 45%; left: 20%; animation-duration: 19s; animation-delay: -9s; opacity: 0.18; }
+    @keyframes drift {
+      0%   { transform: translate(0,0) scale(1); }
+      100% { transform: translate(35px, 25px) scale(1.07); }
+    }
+
+    body::after {
+      content: ''; position: fixed; inset: 0; z-index: 1;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+      pointer-events: none; opacity: 0.5;
+    }
+
+    /* ── Card ── */
+    .container {
+      position: relative; z-index: 10;
+      width: 440px;
+      background: var(--card);
+      border: 1px solid var(--card-border);
+      border-radius: 24px;
+      padding: 48px 44px 44px;
+      backdrop-filter: blur(28px) saturate(160%);
+      box-shadow: 0 0 0 1px rgba(255,255,255,0.04),
+                  0 32px 80px rgba(0,0,0,0.6),
+                  0 0 60px rgba(167,139,250,0.07);
+      animation: slideUp 0.7s cubic-bezier(0.16,1,0.3,1) both;
+    }
+    @keyframes slideUp {
+      from { opacity: 0; transform: translateY(40px) scale(0.97); }
+      to   { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    .logo-mark {
+      width: 48px; height: 48px;
+      background: linear-gradient(135deg, #a78bfa, #06b6d4);
+      border-radius: 14px;
+      margin-bottom: 28px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 22px;
+      box-shadow: 0 8px 24px rgba(167,139,250,0.4);
+      animation: popIn 0.5s 0.3s cubic-bezier(0.16,1,0.3,1) both;
+    }
+    @keyframes popIn {
+      from { opacity: 0; transform: scale(0.6) rotate(-10deg); }
+      to   { opacity: 1; transform: scale(1) rotate(0deg); }
+    }
+
+    h2 {
+      font-size: 26px; font-weight: 700;
+      color: var(--text); letter-spacing: -0.5px; margin-bottom: 6px;
+    }
+    .subtitle {
+      font-size: 14px; color: var(--muted); margin-bottom: 36px; font-weight: 400;
+    }
+
+    /* ── Fields ── */
+    .field {
+      position: relative; margin-bottom: 14px;
+      animation: fadeIn 0.5s both;
+    }
+    .field:nth-child(1) { animation-delay: 0.13s; }
+    .field:nth-child(2) { animation-delay: 0.20s; }
+    .field:nth-child(3) { animation-delay: 0.27s; }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(12px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    input[type="text"],
+    input[type="email"],
+    input[type="password"] {
+      width: 100%;
+      padding: 14px 18px;
+      background: var(--input-bg);
+      border: 1px solid var(--input-border);
+      border-radius: 12px;
+      color: var(--text);
+      font-family: 'Sora', sans-serif;
+      font-size: 14px;
+      outline: none;
+      transition: border-color 0.25s, box-shadow 0.25s, background 0.25s;
+    }
+    input::placeholder { color: var(--muted); }
+    input:focus {
+      border-color: var(--accent);
+      background: rgba(99,102,241,0.06);
+      box-shadow: 0 0 0 3px rgba(99,102,241,0.18);
+    }
+
+    /* ── Password strength ── */
+    #strength {
+      margin-top: 8px;
+      font-size: 12px;
+      font-weight: 500;
+      min-height: 14px;
+      padding-left: 2px;
+      animation: fadeIn 0.3s;
+      transition: color 0.3s;
+    }
+    .strength-bar {
+      display: flex; gap: 5px; margin-top: 6px;
+    }
+    .strength-bar span {
+      flex: 1; height: 3px; border-radius: 99px;
+      background: rgba(255,255,255,0.1);
+      transition: background 0.35s;
+    }
+
+    /* ── Role select ── */
+    .select-wrap {
+      position: relative;
+      margin-bottom: 14px;
+      animation: fadeIn 0.5s 0.34s both;
+    }
+    .select-label {
+      font-size: 12px; font-weight: 500; color: var(--muted);
+      text-transform: uppercase; letter-spacing: 0.6px;
+      margin-bottom: 8px; display: block;
+    }
+    select#role {
+      width: 100%;
+      padding: 14px 42px 14px 18px;
+      background: var(--input-bg);
+      border: 1px solid var(--input-border);
+      border-radius: 12px;
+      color: var(--text);
+      font-family: 'Sora', sans-serif;
+      font-size: 14px;
+      outline: none;
+      cursor: pointer;
+      appearance: none;
+      -webkit-appearance: none;
+      transition: border-color 0.25s, box-shadow 0.25s;
+    }
+    select#role:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(99,102,241,0.18);
+    }
+    select#role option { background: #1e1e2e; color: var(--text); }
+    .select-wrap::after {
+      content: '▾'; position: absolute;
+      right: 16px; bottom: 15px;
+      color: var(--muted); font-size: 13px; pointer-events: none;
+    }
+
+    /* ── Button ── */
+    button {
+      width: 100%; padding: 14px; border: none;
+      border-radius: 12px; font-family: 'Sora', sans-serif;
+      font-size: 14px; font-weight: 600; cursor: pointer;
+      transition: transform 0.15s, box-shadow 0.2s;
+      position: relative; overflow: hidden;
+    }
+    button:active { transform: scale(0.97); }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #a78bfa 0%, #6366f1 100%);
+      color: #fff;
+      margin-top: 8px;
+      box-shadow: 0 4px 20px rgba(167,139,250,0.38);
+      animation: fadeIn 0.5s 0.44s both;
+      letter-spacing: 0.2px;
+    }
+    .btn-primary:hover {
+      box-shadow: 0 6px 28px rgba(167,139,250,0.55);
+      transform: translateY(-1px);
+    }
+
+    button .ripple {
+      position: absolute; border-radius: 50%;
+      background: rgba(255,255,255,0.25);
+      transform: scale(0);
+      animation: ripple 0.55s linear;
+      pointer-events: none;
+    }
+    @keyframes ripple { to { transform: scale(4); opacity: 0; } }
+
+    /* ── Link ── */
+    p {
+      text-align: center; color: var(--muted);
+      font-size: 13px; margin-top: 22px;
+      animation: fadeIn 0.5s 0.5s both;
+    }
+    p a {
+      color: var(--accent2); text-decoration: none;
+      font-weight: 500; transition: color 0.2s;
+    }
+    p a:hover { color: #67e8f9; text-decoration: underline; }
+
+    @media (max-width: 480px) {
+      .container { width: 94vw; padding: 38px 28px 36px; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="bg-orbs">
+  <div class="orb orb-1"></div>
+  <div class="orb orb-2"></div>
+  <div class="orb orb-3"></div>
+</div>
+
+<div class="container">
+  <div class="logo-mark">✦</div>
+  <h2>Create account</h2>
+  <p class="subtitle">Join us — it only takes a minute</p>
+
+  <div class="field">
+    <input type="text" id="name" placeholder="Full name">
+  </div>
+
+  <div class="field">
+    <input type="email" id="email" placeholder="Email address">
+  </div>
+
+  <div class="field">
+    <input type="password" id="password" placeholder="Password" oninput="checkStrength(); updateStrengthUI()">
+    <div id="strength"></div>
+    <div class="strength-bar">
+      <span id="bar1"></span>
+      <span id="bar2"></span>
+      <span id="bar3"></span>
+      <span id="bar4"></span>
+    </div>
+  </div>
+
+  <div class="select-wrap">
+    <label class="select-label" for="role">Role</label>
+    <select id="role">
+      <option value="intern">Intern</option>
+      <option value="mentor">Mentor</option>
+    </select>
+  </div>
+
+  <button class="btn-primary" onclick="register(); rippleEffect(event)">Create Account</button>
+
+  <p>Already have an account? <a href="login.html">Login</a></p>
+</div>
+
+<script>
+  function rippleEffect(e) {
+    const btn = e.currentTarget;
+    const circle = document.createElement('span');
+    const d = Math.max(btn.clientWidth, btn.clientHeight);
+    const rect = btn.getBoundingClientRect();
+    circle.style.cssText = `width:${d}px;height:${d}px;left:${e.clientX-rect.left-d/2}px;top:${e.clientY-rect.top-d/2}px`;
+    circle.classList.add('ripple');
+    btn.appendChild(circle);
+    setTimeout(() => circle.remove(), 600);
+  }
+
+  function updateStrengthUI() {
+    const val = document.getElementById('password').value;
+    const label = document.getElementById('strength');
+    const bars = [
+      document.getElementById('bar1'),
+      document.getElementById('bar2'),
+      document.getElementById('bar3'),
+      document.getElementById('bar4'),
+    ];
+    const reset = () => bars.forEach(b => b.style.background = 'rgba(255,255,255,0.1)');
+    reset();
+
+    if (!val) { label.textContent = ''; return; }
+
+    let score = 0;
+    if (val.length >= 6) score++;
+    if (val.length >= 10) score++;
+    if (/[A-Z]/.test(val) && /[0-9]/.test(val)) score++;
+    if (/[^A-Za-z0-9]/.test(val)) score++;
+
+    const colors = ['#f43f5e','#f97316','#eab308','#22c55e'];
+    const labels = ['Weak','Fair','Good','Strong'];
+    for (let i = 0; i < score; i++) bars[i].style.background = colors[score - 1];
+    label.style.color = colors[score - 1];
+    label.textContent = labels[score - 1] + ' password';
+  }
+</script>
+<script src="js/auth.js"></script>
+</body>
+</html>

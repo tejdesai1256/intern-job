@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard</title>
+</head>
+<body>
+  <h1>Welcome to Dashboard 🎉</h1>
+
+  <script>
+    window.onload = () => {
+      const params = new URLSearchParams(window.location.search);
+      const token = params.get("token");
+
+      if (token) {
+        localStorage.setItem("token", token);
+      }
+
+      const savedToken = localStorage.getItem("token");
+
+      if (!savedToken) {
+        alert("Please login first");
+        window.location.href = "login.html";
+      } else {
+        console.log("Token:", savedToken);
+      }
+    };
+  </script>
+</body>
+</html>
