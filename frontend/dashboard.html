@@ -1,31 +1,65 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
   <meta charset="UTF-8">
+  <title>Jobjockey</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Dashboard</title>
+
+  <!-- FONT -->
+  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;600&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="css/dashboard.css">
 </head>
+
 <body>
-  <h1>Welcome to Dashboard 🎉</h1>
 
-  <script>
-    window.onload = () => {
-      const params = new URLSearchParams(window.location.search);
-      const token = params.get("token");
+<div class="app">
 
-      if (token) {
-        localStorage.setItem("token", token);
-      }
+  <!-- SIDEBAR -->
+  <div class="sidebar">
 
-      const savedToken = localStorage.getItem("token");
+    <div class="logo">⚡ JOBJOCKEY</div>
 
-      if (!savedToken) {
-        alert("Please login first");
-        window.location.href = "login.html";
-      } else {
-        console.log("Token:", savedToken);
-      }
-    };
-  </script>
+    <div class="channels">
+      <div class="channel active" onclick="switchChannel('general')"># general</div>
+      <div class="channel" onclick="switchChannel('jobs')"># jobs</div>
+      <div class="channel" onclick="switchChannel('interviews')"># interviews</div>
+    </div>
+
+    <!-- USER PROFILE -->
+    <div class="profile">
+      <div class="avatar" id="avatar">T</div>
+      <div>
+        <div id="userName">User</div>
+        <small>Online</small>
+      </div>
+      <button onclick="logout()">⎋</button>
+    </div>
+
+  </div>
+
+  <!-- CHAT AREA -->
+  <div class="chat">
+
+    <div class="header">
+      <h3 id="channelName"># general</h3>
+    </div>
+
+    <div id="chatBox" class="messages"></div>
+
+    <div id="typing" class="typing"></div>
+
+    <div class="input-area">
+      <input id="message" placeholder="Message..." />
+      <button onclick="sendMessage()">➤</button>
+    </div>
+
+  </div>
+
+</div>
+
+<script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+<script src="js/dashboard.js"></script>
+
 </body>
 </html>

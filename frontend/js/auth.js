@@ -45,15 +45,20 @@ async function login() {
     headers: {
       "Content-Type": "application/json"
     },
+    body: JSON.stringify({ email, password }),
     credentials: "include"
   });
 
   const data = await res.json();
 
-  console.log(data);
-  alert("Login successful");
+  if (res.ok) {
+    alert("Login successful");
+    localStorage.setItem("token", data.token); // if backend sends token
+    window.location.href = "dashboard.html";   // ✅ redirect
+  } else {
+    alert(data.message || "Login failed");
+  }
 }
-
 
 //google authentiaction
 function googleLogin() {
