@@ -2,12 +2,10 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Jobjockey</title>
+  <title>Dashboard</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <!-- FONT -->
   <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;600&display=swap" rel="stylesheet">
-
   <link rel="stylesheet" href="css/dashboard.css">
 </head>
 
@@ -18,40 +16,381 @@
   <!-- SIDEBAR -->
   <div class="sidebar">
 
-    <div class="logo">⚡ JOBJOCKEY</div>
+    <div>
+      <div class="logo">⚡ JOBJOCKEY</div>
 
-    <div class="channels">
-      <div class="channel active" onclick="switchChannel('general')"># general</div>
-      <div class="channel" onclick="switchChannel('jobs')"># jobs</div>
-      <div class="channel" onclick="switchChannel('interviews')"># interviews</div>
+      <div class="menu">
+        <a onclick="showSection('dashboard')">🏠 Dashboard</a>
+        <a onclick="showSection('tasks')" >📋 Tasks</a>
+        <a onclick="showSection('projects')">📁 Projects</a>
+        <a onclick="showSection('chat')">💬 Chat</a>
+        <a onclick="showSection('reports')">📊 Reports</a>
+
+        <!-- ADMIN ONLY -->
+        <a id="adminMenu" onclick="showSection('admin')" style="display:none;">⚙️ Admin</a>
+      </div>
     </div>
 
-    <!-- USER PROFILE -->
+    <!-- PROFILE -->
     <div class="profile">
       <div class="avatar" id="avatar">T</div>
       <div>
         <div id="userName">User</div>
-        <small>Online</small>
+        <small id="userRole">Role</small>
       </div>
       <button onclick="logout()">⎋</button>
     </div>
 
   </div>
 
-  <!-- CHAT AREA -->
-  <div class="chat">
+  <!-- MAIN CONTENT -->
+  <div class="main">
 
-    <div class="header">
-      <h3 id="channelName"># general</h3>
+    <!-- TOP NAVBAR -->
+    <div class="topbar">
+      <h2 id="welcomeText">Welcome</h2>
+
+      <div class="top-actions">
+        🔔
+        <button onclick="logout()">Logout</button>
+      </div>
     </div>
 
-    <div id="chatBox" class="messages"></div>
+    <!-- CONTENT AREA -->
+    <div class="content">
 
-    <div id="typing" class="typing"></div>
+      <!-- DASHBOARD -->
+      <div id="dashboard" class="section active">
+        <div class="cards">
+          <div class="card">📋 Total Tasks <h3>10</h3></div>
+          <div class="card">✅ Completed <h3>6</h3></div>
+          <div class="card">📊 Attendance <h3>80%</h3></div>
+        </div>
+      </div>
 
-    <div class="input-area">
-      <input id="message" placeholder="Message..." />
-      <button onclick="sendMessage()">➤</button>
+      <!-- CHAT -->
+      <div id="chat" class="section">
+        <div class="chat-container">
+          <!-- CHANNELS SIDEBAR -->
+          <div class="chat-sidebar">
+            <div class="chat-header">
+              <h3>💬 Messages</h3>
+              <button onclick="openNewChatModal()" class="btn-icon">+</button>
+            </div>
+
+            <div class="chat-search">
+              <input type="text" id="chatSearch" placeholder="Search chats..." onkeyup="filterChats()">
+            </div>
+
+            <div id="chatsList" class="chats-list"></div>
+          </div>
+
+          <!-- MAIN CHAT AREA -->
+          <div class="chat-main">
+            <div class="chat-header-main">
+              <div>
+                <h3 id="chatChannelName">Select a chat</h3>
+                <small id="chatChannelInfo" style="color: #aaa;"></small>
+              </div>
+              <button class="btn-icon" onclick="toggleChatInfo()">ℹ️</button>
+            </div>
+
+            <div id="chatBox" class="messages"></div>
+
+            <div class="input-area">
+              <input id="message" placeholder="Type a message..." />
+              <button onclick="sendMessage()" class="btn-send">➤</button>
+            </div>
+          </div>
+
+          <!-- CHAT INFO PANEL -->
+          <div id="chatInfo" class="chat-info" style="display: none;">
+            <h4>Chat Info</h4>
+            <div id="chatInfoContent"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- TASKS -->
+      <div id="tasks" class="section">
+        <div class="section-header">
+          <h1>📋 Tasks</h1>
+          <button onclick="openNewTaskModal()" class="btn-primary">+ New Task</button>
+        </div>
+
+        <div class="tasks-filters">
+          <button onclick="filterTasks('all')" class="filter-btn active">All</button>
+          <button onclick="filterTasks('pending')" class="filter-btn">Pending</button>
+          <button onclick="filterTasks('in-progress')" class="filter-btn">In Progress</button>
+          <button onclick="filterTasks('completed')" class="filter-btn">Completed</button>
+        </div>
+
+        <div id="tasksList" class="tasks-list"></div>
+      </div>
+
+      <!-- PROJECTS -->
+      <div id="projects" class="section">
+        <div class="section-header">
+          <h1>📁 Projects</h1>
+          <button onclick="openNewProjectModal()" class="btn-primary">+ New Project</button>
+        </div>
+
+        <div class="projects-filters">
+          <button onclick="filterProjects('all')" class="filter-btn active">All</button>
+          <button onclick="filterProjects('active')" class="filter-btn">Active</button>
+          <button onclick="filterProjects('completed')" class="filter-btn">Completed</button>
+          <button onclick="filterProjects('on-hold')" class="filter-btn">On Hold</button>
+        </div>
+
+        <div id="projectsList" class="projects-list"></div>
+      </div>
+
+      <!-- REPORTS -->
+      <div id="reports" class="section">
+        <div class="section-header">
+          <h1>📊 Reports</h1>
+          <div class="report-actions">
+            <input type="date" id="reportStartDate" onchange="updateReports()">
+            <input type="date" id="reportEndDate" onchange="updateReports()">
+            <button onclick="exportReport()" class="btn-primary">📥 Export</button>
+          </div>
+        </div>
+
+        <div class="reports-grid">
+          <!-- PERFORMANCE CARDS -->
+          <div class="report-card">
+            <div class="report-card-header">
+              <h3>👤 Performance</h3>
+            </div>
+            <div class="stat">
+              <div class="stat-label">Tasks Completed</div>
+              <div class="stat-value" id="tasksCompleted">0</div>
+              <div class="stat-bar">
+                <div class="stat-bar-fill" id="tasksCompletedBar" style="width: 0%"></div>
+              </div>
+            </div>
+            <div class="stat">
+              <div class="stat-label">Avg Completion Time</div>
+              <div class="stat-value" id="avgCompletionTime">-</div>
+            </div>
+          </div>
+
+          <!-- ATTENDANCE -->
+          <div class="report-card">
+            <div class="report-card-header">
+              <h3>📅 Attendance</h3>
+            </div>
+            <div class="stat">
+              <div class="stat-label">Attendance Rate</div>
+              <div class="stat-value" id="attendanceRate">0%</div>
+              <div class="stat-bar">
+                <div class="stat-bar-fill" id="attendanceBar" style="width: 0%"></div>
+              </div>
+            </div>
+            <div class="stat">
+              <div class="stat-label">Days Present</div>
+              <div class="stat-value" id="daysPresent">0</div>
+            </div>
+          </div>
+
+          <!-- PROJECTS -->
+          <div class="report-card">
+            <div class="report-card-header">
+              <h3>📁 Projects</h3>
+            </div>
+            <div class="stat">
+              <div class="stat-label">Active Projects</div>
+              <div class="stat-value" id="activeProjects">0</div>
+            </div>
+            <div class="stat">
+              <div class="stat-label">Completed Projects</div>
+              <div class="stat-value" id="completedProjects">0</div>
+            </div>
+          </div>
+
+          <!-- PRODUCTIVITY -->
+          <div class="report-card">
+            <div class="report-card-header">
+              <h3>⚡ Productivity</h3>
+            </div>
+            <div class="stat">
+              <div class="stat-label">Productivity Score</div>
+              <div class="stat-value" id="productivityScore">0%</div>
+              <div class="stat-bar">
+                <div class="stat-bar-fill" id="productivityBar" style="width: 0%"></div>
+              </div>
+            </div>
+            <div class="stat">
+              <div class="stat-label">Performance Trend</div>
+              <div class="stat-value" id="performanceTrend">📈 +5%</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- DETAILED REPORTS -->
+        <div class="reports-section">
+          <h2>Detailed Reports</h2>
+
+          <div class="report-tabs">
+            <button onclick="showReportTab('tasks-report')" class="report-tab-btn active">Tasks Report</button>
+            <button onclick="showReportTab('projects-report')" class="report-tab-btn">Projects Report</button>
+            <button onclick="showReportTab('attendance-report')" class="report-tab-btn">Attendance Report</button>
+          </div>
+
+          <!-- TASKS REPORT -->
+          <div id="tasks-report" class="report-tab active">
+            <table class="report-table">
+              <thead>
+                <tr>
+                  <th>Task</th>
+                  <th>Status</th>
+                  <th>Priority</th>
+                  <th>Completed On</th>
+                  <th>Time Spent</th>
+                </tr>
+              </thead>
+              <tbody id="tasksReportTable"></tbody>
+            </table>
+          </div>
+
+          <!-- PROJECTS REPORT -->
+          <div id="projects-report" class="report-tab">
+            <table class="report-table">
+              <thead>
+                <tr>
+                  <th>Project</th>
+                  <th>Status</th>
+                  <th>Progress</th>
+                  <th>Lead</th>
+                  <th>End Date</th>
+                </tr>
+              </thead>
+              <tbody id="projectsReportTable"></tbody>
+            </table>
+          </div>
+
+          <!-- ATTENDANCE REPORT -->
+          <div id="attendance-report" class="report-tab">
+            <table class="report-table">
+              <thead>
+                <tr>
+                  <th>Date</th>
+                  <th>Status</th>
+                  <th>Check-In</th>
+                  <th>Check-Out</th>
+                  <th>Hours Worked</th>
+                </tr>
+              </thead>
+              <tbody id="attendanceReportTable"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- ADMIN -->
+      <div id="admin" class="section">⚙️ Admin Panel</div>
+
+    </div>
+
+  </div>
+
+  <!-- TASK MODAL -->
+  <div id="taskModal" class="modal">
+    <div class="modal-content">
+      <span class="close" onclick="closeNewTaskModal()">&times;</span>
+      <h2>Create New Task</h2>
+      <form onsubmit="createTask(event)">
+        <div class="form-group">
+          <label>Title</label>
+          <input type="text" id="taskTitle" required placeholder="Task title">
+        </div>
+        <div class="form-group">
+          <label>Description</label>
+          <textarea id="taskDesc" placeholder="Task description"></textarea>
+        </div>
+        <div class="form-group">
+          <label>Priority</label>
+          <select id="taskPriority">
+            <option value="low">Low</option>
+            <option value="medium" selected>Medium</option>
+            <option value="high">High</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Due Date</label>
+          <input type="date" id="taskDueDate">
+        </div>
+        <button type="submit" class="btn-primary">Create Task</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- PROJECT MODAL -->
+  <div id="projectModal" class="modal">
+    <div class="modal-content">
+      <span class="close" onclick="closeNewProjectModal()">&times;</span>
+      <h2>Create New Project</h2>
+      <form onsubmit="createProject(event)">
+        <div class="form-group">
+          <label>Project Name</label>
+          <input type="text" id="projectName" required placeholder="Project name">
+        </div>
+        <div class="form-group">
+          <label>Description</label>
+          <textarea id="projectDesc" placeholder="Project description"></textarea>
+        </div>
+        <div class="form-group">
+          <label>Team Lead</label>
+          <input type="text" id="projectLead" placeholder="Team lead name">
+        </div>
+        <div class="form-group">
+          <label>Start Date</label>
+          <input type="date" id="projectStartDate">
+        </div>
+        <div class="form-group">
+          <label>End Date</label>
+          <input type="date" id="projectEndDate">
+        </div>
+        <div class="form-group">
+          <label>Status</label>
+          <select id="projectStatus">
+            <option value="active" selected>Active</option>
+            <option value="on-hold">On Hold</option>
+            <option value="completed">Completed</option>
+          </select>
+        </div>
+        <button type="submit" class="btn-primary">Create Project</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- CHAT MODAL -->
+  <div id="chatModal" class="modal">
+    <div class="modal-content">
+      <span class="close" onclick="closeNewChatModal()">&times;</span>
+      <h2>Start New Chat</h2>
+      <form onsubmit="createNewChat(event)">
+        <div class="form-group">
+          <label>Chat Name</label>
+          <input type="text" id="newChatName" required placeholder="Chat name (e.g., Project Alpha)">
+        </div>
+        <div class="form-group">
+          <label>Chat Type</label>
+          <select id="newChatType">
+            <option value="direct">Direct Message</option>
+            <option value="group" selected>Group Chat</option>
+            <option value="channel">Channel</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Members (comma-separated)</label>
+          <input type="text" id="newChatMembers" placeholder="John, Jane, Bob">
+        </div>
+        <button type="submit" class="btn-primary">Create Chat</button>
+      </form>
+    </div>
+  </div>
+
     </div>
 
   </div>
